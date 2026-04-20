@@ -10,24 +10,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from typing import cast
+
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, label_binarize
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import roc_curve, auc
 
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.utils import to_categorical
+from keras.models import Sequential
+from keras.layers import Dense, Input
+from keras.utils import to_categorical
+
 
 # ----------------------------------------------------------------------
 # 1. Chargement du dataset IRIS
 # ----------------------------------------------------------------------
+# Utilisation d'un accès par clés pour éviter les faux positifs de Pylance
+# sur les attributs .data, .target et .target_names
 iris = load_iris()  # 150 échantillons, 4 caractéristiques, 3 classes
-X = iris.data       # shape (150, 4)
-y = iris.target     # labels : 0 = setosa, 1 = versicolor, 2 = virginica
-class_names = iris.target_names
+X = np.asarray(iris["data"])  # shape (150, 4)
+y = np.asarray(iris["target"])  # labels : 0 = setosa, 1 = versicolor, 2 = virginica
+class_names = np.asarray(iris["target_names"])
 
 # ----------------------------------------------------------------------
 # 2. Normalisation des données (centrage-réduction)
@@ -44,7 +48,8 @@ y_cat = to_categorical(y, num_classes=3)
 # 4. Découpage entraînement / test
 # ----------------------------------------------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y_cat,
+    X_scaled,
+    y_cat,
     test_size=0.2,
     random_state=42,
     stratify=y
@@ -52,21 +57,20 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # ----------------------------------------------------------------------
 # 5. Construction du réseau de neurones
-#    Réseau dense à 2 couches cachées, comme décrit dans le RI
+# Réseau dense à 2 couches cachées, comme décrit dans le RI
 # ----------------------------------------------------------------------
-model = Sequential()
-# Couche d'entrée + 1ère couche cachée
-model.add(Dense(10, activation='relu', input_shape=(4,)))
-# 2e couche cachée
-model.add(Dense(8, activation='relu'))
-# Couche de sortie : 3 neurones (3 classes) + softmax
-model.add(Dense(3, activation='softmax'))
+model = Sequential([
+    Input(shape=(4,)),
+    Dense(10, activation='relu'),
+    Dense(8, activation='relu'),
+    Dense(3, activation='softmax')
+])
 
 # ----------------------------------------------------------------------
 # 6. Compilation du modèle
-#    - Fonction de perte : categorical_crossentropy (classification multi-classe)
-#    - Optimiseur : Adam (descente de gradient améliorée)
-#    - Métrique : accuracy
+# - Fonction de perte : categorical_crossentropy (classification multi-classe)
+# - Optimiseur : Adam (descente de gradient améliorée)
+# - Métrique : accuracy
 # ----------------------------------------------------------------------
 model.compile(
     optimizer='adam',
@@ -77,20 +81,22 @@ model.compile(
 # ----------------------------------------------------------------------
 # 7. Entraînement du modèle
 # ----------------------------------------------------------------------
+# On retire verbose=0 car certaines versions/stubs Keras déclenchent
+# un faux positif Pylance sur ce paramètre
 history = model.fit(
-    X_train, y_train,
+    X_train,
+    y_train,
     validation_data=(X_test, y_test),
     epochs=150,
-    batch_size=8,
-    verbose=0  # passe à 1 pour voir l'entraînement
+    batch_size=8
 )
 
 # ----------------------------------------------------------------------
 # 8. Évaluation finale sur l'ensemble de test
 # ----------------------------------------------------------------------
-test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
+test_loss, test_acc = model.evaluate(X_test, y_test)
 print(f"Loss sur le test : {test_loss:.4f}")
-print(f"Accuracy sur le test : {test_acc*100:.2f}%")
+print(f"Accuracy sur le test : {test_acc * 100:.2f}%")
 
 # ----------------------------------------------------------------------
 # 9. Courbes d'apprentissage (loss et accuracy)
@@ -126,9 +132,11 @@ y_pred_proba = model.predict(X_test)
 y_pred = np.argmax(y_pred_proba, axis=1)
 y_true = np.argmax(y_test, axis=1)
 
-cm = confusion_matrix(y_true, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
-disp.plot(cmap=plt.cm.Blues)
+# Attention à ne pas appeler la matrice "cm", sinon cela masque
+# un éventuel alias matplotlib.cm
+conf_mat = confusion_matrix(y_true, y_pred)
+disp = ConfusionMatrixDisplay(confusion_matrix=conf_mat, display_labels=class_names)
+disp.plot(cmap="Blues")
 plt.title("Matrice de confusion - IRIS")
 plt.show()
 
@@ -136,12 +144,14 @@ plt.show()
 # 11. Courbes ROC multi-classe
 # ----------------------------------------------------------------------
 # Binarisation des labels pour calculer une ROC par classe
-y_test_bin = label_binarize(y_true, classes=[0, 1, 2])
+# Conversion explicite en ndarray pour éviter le faux positif Pylance
+# sur le type spmatrix lors de l'indexation y_test_bin[:, i]
+y_test_bin = cast(np.ndarray, np.asarray(label_binarize(y_true, classes=[0, 1, 2])))
 n_classes = y_test_bin.shape[1]
 
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
+fpr = {}
+tpr = {}
+roc_auc = {}
 
 for i in range(n_classes):
     fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_proba[:, i])
@@ -150,6 +160,7 @@ for i in range(n_classes):
 # Tracé des courbes ROC
 plt.figure(figsize=(6, 5))
 colors = ['darkorange', 'green', 'blue']
+
 for i, color in zip(range(n_classes), colors):
     plt.plot(
         fpr[i],
