@@ -7,10 +7,11 @@
 # - Courbes ROC multi-classe
 # ======================================================================
 
+import matplotlib
+matplotlib.use("Agg")  # Backend non interactif pour WSL / terminal sans interface graphique
+
 import numpy as np
 import matplotlib.pyplot as plt
-
-from typing import cast
 
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -18,16 +19,14 @@ from sklearn.preprocessing import StandardScaler, label_binarize
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import roc_curve, auc
 
-from keras.models import Sequential
-from keras.layers import Dense, Input
-from keras.utils import to_categorical
-
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.utils import to_categorical
 
 # ----------------------------------------------------------------------
 # 1. Chargement du dataset IRIS
 # ----------------------------------------------------------------------
-# Utilisation d'un accès par clés pour éviter les faux positifs de Pylance
-# sur les attributs .data, .target et .target_names
+# Accès par clés pour éviter les faux positifs de Pylance sur .data/.target/.target_names
 iris = load_iris()  # 150 échantillons, 4 caractéristiques, 3 classes
 X = np.asarray(iris["data"])  # shape (150, 4)
 y = np.asarray(iris["target"])  # labels : 0 = setosa, 1 = versicolor, 2 = virginica
@@ -81,20 +80,19 @@ model.compile(
 # ----------------------------------------------------------------------
 # 7. Entraînement du modèle
 # ----------------------------------------------------------------------
-# On retire verbose=0 car certaines versions/stubs Keras déclenchent
-# un faux positif Pylance sur ce paramètre
 history = model.fit(
     X_train,
     y_train,
     validation_data=(X_test, y_test),
     epochs=150,
-    batch_size=8
+    batch_size=8,
+    verbose=1  # mettre 0 si tu ne veux pas voir les epochs
 )
 
 # ----------------------------------------------------------------------
 # 8. Évaluation finale sur l'ensemble de test
 # ----------------------------------------------------------------------
-test_loss, test_acc = model.evaluate(X_test, y_test)
+test_loss, test_acc = model.evaluate(X_test, y_test, verbose=1)
 print(f"Loss sur le test : {test_loss:.4f}")
 print(f"Accuracy sur le test : {test_acc * 100:.2f}%")
 
@@ -122,31 +120,29 @@ plt.title("Évolution de la précision")
 plt.legend()
 
 plt.tight_layout()
-plt.show()
+plt.savefig("training_curves.png", dpi=300, bbox_inches="tight")
+plt.close()
 
 # ----------------------------------------------------------------------
 # 10. Matrice de confusion
 # ----------------------------------------------------------------------
 # Prédictions sur l'ensemble de test
-y_pred_proba = model.predict(X_test)
+y_pred_proba = model.predict(X_test, verbose=1)
 y_pred = np.argmax(y_pred_proba, axis=1)
 y_true = np.argmax(y_test, axis=1)
 
-# Attention à ne pas appeler la matrice "cm", sinon cela masque
-# un éventuel alias matplotlib.cm
 conf_mat = confusion_matrix(y_true, y_pred)
 disp = ConfusionMatrixDisplay(confusion_matrix=conf_mat, display_labels=class_names)
 disp.plot(cmap="Blues")
 plt.title("Matrice de confusion - IRIS")
-plt.show()
+plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
+plt.close()
 
 # ----------------------------------------------------------------------
 # 11. Courbes ROC multi-classe
 # ----------------------------------------------------------------------
 # Binarisation des labels pour calculer une ROC par classe
-# Conversion explicite en ndarray pour éviter le faux positif Pylance
-# sur le type spmatrix lors de l'indexation y_test_bin[:, i]
-y_test_bin = cast(np.ndarray, np.asarray(label_binarize(y_true, classes=[0, 1, 2])))
+y_test_bin = np.asarray(label_binarize(y_true, classes=[0, 1, 2]))
 n_classes = y_test_bin.shape[1]
 
 fpr = {}
@@ -178,4 +174,7 @@ plt.ylabel("Taux de vrais positifs (TPR)")
 plt.title("Courbes ROC multi-classe - IRIS")
 plt.legend(loc="lower right")
 plt.grid(True)
-plt.show()
+plt.savefig("roc_curves.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+print("Figures enregistrées : training_curves.png, confusion_matrix.png, roc_curves.png")   
