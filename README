@@ -69,4 +69,19 @@ When you run the script, it will display:
 
 - Training loss and accuracy curves
 - A confusion matrix
-- ROC curves for the
+- ROC curves for the 3 classes
+- Final test accuracy and loss in the terminal
+
+## Notes
+
+- The code is written to work with Python 3.9.13.
+- Some lines were adapted to avoid Pylance warnings in VS Code.
+- The script keeps the original French comments for clarity.
+
+## File structure
+
+```text
+MachineLearning/
+├── main.py
+└── README.md
+```
