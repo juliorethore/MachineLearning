@@ -1,0 +1,72 @@
+# IRIS Neural Network with TensorFlow / Keras
+
+This project trains a simple neural network on the classic Iris dataset using TensorFlow / Keras and scikit-learn.
+
+## Features
+
+- Loads and preprocesses the Iris dataset.
+- Normalizes the input features with `StandardScaler`.
+- Trains a dense neural network for multi-class classification.
+- Displays training and validation loss/accuracy curves.
+- Generates a confusion matrix.
+- Plots ROC curves for each class.
+
+## Requirements
+
+- Python 3.9.13
+- numpy
+- matplotlib
+- scikit-learn
+- tensorflow
+
+## Installation
+
+Install the required packages with:
+
+```bash
+pip install numpy matplotlib scikit-learn tensorflow
+```
+
+If you use a virtual environment, activate it first before installing the dependencies.
+
+## How to run
+
+Run the script with:
+
+```bash
+python main.py
+```
+
+## Dataset
+
+The project uses the Iris dataset provided by scikit-learn. It contains:
+
+- 150 samples
+- 4 features per sample
+- 3 classes:
+  - setosa
+  - versicolor
+  - virginica
+
+## Model architecture
+
+The neural network is a simple dense model:
+
+- Input layer: 4 features
+- Hidden layer 1: 16 neurons, ReLU activation
+- Hidden layer 2: 8 neurons, ReLU activation
+- Output layer: 3 neurons, Softmax activation
+
+The model is trained with:
+
+- Loss function: `sparse_categorical_crossentropy`
+- Optimizer: `adam`
+- Metric: `accuracy`
+
+## Outputs
+
+When you run the script, it will display:
+
+- Training loss and accuracy curves
+- A confusion matrix
+- ROC curves for the

@@ -1,0 +1,136 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\geometry{margin=2.5cm}
+
+% Configuration pour le code Python
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!60!black},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny,
+  frame=single,
+  breaklines=true,
+  tabsize=2
+}
+
+\title{Expliquer comment fonctionne un mod\`ele de r\'eseau de neurones en intelligence artificielle pour une utilisation en ``Machine Learning'' ?}
+\author{Mohamed-Amine TARZI \\ Julio R\'ETHOR\'E}
+\date{Avril 2026}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+Depuis 5 ans, nous entendons parler des intelligences artificielles qui \'evoluent et deviennent de plus en plus r\'ealistes et intelligentes, devenant presque un danger pour certains emplois. Pourtant, \`a notre niveau, nous ne savons pas ce qui se cache derri\`ere le terme IA. Aujourd'hui, dans ce rapport, nous allons expliquer le fonctionnement des r\'eseaux de neurones, indispensables au fonctionnement de certaines IA [file:1]. 
+
+La premi\`ere intelligence artificielle a \'et\'e cr\'e\'ee en 1940. Cependant, ce n'est qu'avec le d\'eveloppement rapide de la puissance de calcul des ordinateurs et la d\'ecouverte d'outils math\'ematiques utiles \`a ces IA que celles-ci se sont d\'evelopp\'ees [file:1]. 
+
+Dans quelle mesure la compr\'ehension du fonctionnement des r\'eseaux neuronaux permet-elle d'expliquer leur efficacit\'e et leurs nombreuses applications~? Nous pr\'esenterons d'abord les r\'eseaux de neurones, leur fonctionnement, des exemples d'applications, leurs limites, et enfin un code illustratif [file:1].
+
+\section{Pr\'esentation historique des r\'eseaux de neurones}
+
+Depuis les ann\'ees 1930, les scientifiques cherchent \`a d\'evelopper une machine capable de raisonner~: l'intelligence artificielle. Ils ont cr\'e\'e des domaines comme le \emph{machine learning}, qui permet \`a une machine de s'améliorer au fil du temps en \'etudiant des exemples pour d\'evelopper un mod\`ele optimal [file:1]. 
+
+Un algorithme d'optimisation minimise alors la distance entre le mod\`ele et les donn\'ees (ex.~: mod\`eles lin\'eaires, arbres de d\'ecision) [file:1]. 
+
+En 1943, McCulloch et Pitts cr\'eent le premier r\'eseau de neurones artificiels en imitant les neurones humains. Chaque neurone applique une fonction, recréant des portes logiques (AND, OR) et r\'esolvant tout probl\`eme bool\'een [file:1]. 
+
+Cela suscite un engouement, mais le mod\`ele manque d'apprentissage automatique. En 1957, Frank Rosenblatt propose le \emph{perceptron}, inspir\'e de la th\'eorie de Hebb~: les liens synaptiques se renforcent si deux neurones s'activent ensemble. La mise \`a jour des poids est donn\'ee par 
+\[
+\mathbf{w} \leftarrow \mathbf{w} + \eta (y - \hat{y}) \mathbf{x}
+\]
+o\`u $\eta$ est la vitesse d'apprentissage, $y$ la sortie attendue et $\hat{y}$ la sortie pr\'edite [file:1]. 
+
+Le perceptron est lin\'eaire et \'echoue sur XOR, menant au premier ``hiver de l'IA'' (1974--1980) en raison du manque de puissance de calcul et de donn\'ees [file:1]. 
+
+En 1986, Geoffrey Hinton introduit le perceptron multicouche (non lin\'eaire) avec des couches cach\'ees et la \emph{backpropagation} [file:1]. Dans les ann\'ees 1990, Yann LeCun d\'eveloppe les r\'eseaux convolutifs (CNN) pour les images et la reconnaissance vocale [file:1].
+
+\section{Fonctionnement des r\'eseaux de neurones}
+
+\subsection{Neurone artificiel de base (McCulloch-Pitts)}
+Un neurone calcule 
+\[
+z = \sum_i w_i x_i + b
+\]
+puis applique une activation (ex.~seuil \`a 0~: $f(z) = 1$ si $z > 0$, sinon 0) [file:1].
+
+\subsection{Perceptron et descente de gradient}
+Rosenblatt ajoute l'apprentissage. Hinton introduit la descente de gradient~:
+\[
+w \leftarrow w - \eta \frac{\partial E}{\partial w}
+\]
+o\`u $E$ est l'erreur. Le processus it\'eratif ajuste les poids [file:1].
+
+\subsection{Backpropagation}
+Les donn\'ees passent par les couches (forward pass). L'erreur est propag\'ee \`a rebours (backward pass) pour ajuster tous les poids via les gradients [file:1]. Cela automatise l'apprentissage multicouche.
+
+\section{Applications : exemple en botanique}
+
+Les CNN traitent les images comme des matrices de pixels. Les couches extraires des contours, formes, puis objets (ex.~: identification de plantes via photos) [file:1]. 
+
+Applications mobiles identifient les esp\`eces en temps r\'eel, r\'eduisant erreurs et temps, mais sensibles \`a la qualit\'e des donn\'ees [file:1].
+
+\section{Limites et solutions}
+
+- \textbf{Besoins massifs en donn\'ees et calcul}~: GPU/TPU n\'ecessaires [file:1].
+- \textbf{Bo\^ite noire}~: IA explicable (XAI) en d\'eveloppement [file:1].
+- \textbf{Overfitting}~: R\'egularisation, dropout [file:1].
+- \textbf{Probl\`emes de gradient}~: Optimiseurs comme Adam [file:1].
+
+\section{Annexe : Code Python illustratif}
+
+Voici un exemple simple de perceptron en Python (pour pr\'ecisions, comme mentionn\'e) [file:1] :
+
+\begin{lstlisting}
+import numpy as np
+
+class Perceptron:
+    def __init__(self, eta=0.01, n_iter=50):
+        self.eta = eta
+        self.n_iter = n_iter
+    
+    def fit(self, X, y):
+        self.w_ = np.zeros(1 + X.shape[1])
+        for _ in range(self.n_iter):
+            for xi, target in zip(X, y):
+                update = self.eta * (target - self.predict(xi))
+                self.w_[1:] += update * xi
+                self.w_[0] += update
+        return self
+    
+    def predict(self, X):
+        return np.where(np.dot(X, self.w_[1:]) + self.w_[0] >= 0.0, 1, -1)
+
+# Exemple d'utilisation
+X = np.array([[1, 1], [1, -1], [-1, 1], [-1, -1]])
+y = np.array([1, -1, -1, -1])  # Porte AND logique
+p = Perceptron().fit(X, y)
+print(p.predict(X))
+\end{lstlisting}
+
+Ce code illustre l'apprentissage d'une porte logique [file:1].
+
+\section{Conclusion}
+
+La compr\'ehension des r\'eseaux de neurones -- de l'historique aux m\'ecanismes comme la backpropagation -- explique leur efficacit\'e en machine learning et applications, malgr\'e des limites surmontables [file:1].
+
+\end{document}
