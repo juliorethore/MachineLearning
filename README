@@ -85,3 +85,57 @@ MachineLearning/
 ├── main.py
 └── README.md
 ```
+
+
+
+
+
+FOR THE LINUX VERSION ::
+
+## Linux / WSL version
+
+This project runs on Linux and WSL using Python 3.9.13.
+
+### Requirements
+Install the dependencies with:
+
+```bash
+python3 -m pip install numpy matplotlib scikit-learn tensorflow
+```
+
+If you want to display images directly in a desktop Linux session, you can also install an image viewer such as Eye of GNOME (`eog`) or use the default system viewer.
+
+### Run the program
+
+```bash
+python3 main.py
+```
+
+### Output
+
+The script trains a neural network on the Iris dataset and saves the graphs as PNG files instead of opening popup windows:
+
+- `training_curves.png`
+- `confusion_matrix.png`
+- `roc_curves.png`
+
+### View the images on Linux
+
+You can open the generated images with:
+
+```bash
+xdg-open training_curves.png
+xdg-open confusion_matrix.png
+xdg-open roc_curves.png
+```
+
+On Ubuntu, you can also use: (preferably)
+
+```bash
+eog training_curves.png 
+```
+
+### Notes
+
+- The Linux version uses a non-interactive Matplotlib backend, so it works without `tkinter`.
+- If `xdg-open` does not work, make sure you are running in a graphical desktop session.
