@@ -53,7 +53,7 @@ The project uses the Iris dataset provided by scikit-learn. It contains:
 The neural network is a simple dense model:
 
 - Input layer: 4 features
-- Hidden layer 1: 16 neurons, ReLU activation
+- Hidden layer 1: 10 neurons, ReLU activation
 - Hidden layer 2: 8 neurons, ReLU activation
 - Output layer: 3 neurons, Softmax activation
 
@@ -76,12 +76,3 @@ When you run the script, it will display:
 
 - The code is written to work with Python 3.9.13.
 - Some lines were adapted to avoid Pylance warnings in VS Code.
-- The script keeps the original French comments for clarity.
-
-## File structure
-
-```text
-MachineLearning/
-├── main.py
-└── README.md
-```

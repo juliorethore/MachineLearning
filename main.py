@@ -86,7 +86,7 @@ history = model.fit(
     validation_data=(X_test, y_test),
     epochs=150,
     batch_size=8,
-    verbose=1  # mettre 0 si tu ne veux pas voir les epochs
+    verbose=1  
 )
 
 # ----------------------------------------------------------------------
